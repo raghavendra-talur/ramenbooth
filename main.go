@@ -310,6 +310,10 @@ func addSchemes() {
 	// Expect(err).NotTo(HaveOccurred())
 }
 
+func usage() {
+	fmt.Println("Usage: ramenbooth --hub <path to hub kubeconfig> --dr1 <path to dr1 kubeconfig> --dr2 <path to dr2 kubeconfig>")
+}
+
 func main() {
 	testLogger := zap.New(zap.UseFlagOptions(&zap.Options{
 		Development: true,
@@ -317,6 +321,14 @@ func main() {
 		TimeEncoder: zapcore.ISO8601TimeEncoder,
 	}))
 	logf.SetLogger(testLogger)
+
+	// if kubeconfigs are not provided, exit
+	if hub == "" || dr1 == "" || dr2 == "" {
+		fmt.Println("Please provide kubeconfigs for hub and managed clusters")
+		usage()
+		os.Exit(1)
+	}
+
 	addSchemes()
 	p := tea.NewProgram(initialModel(), tea.WithAltScreen())
 	if _, err := p.Run(); err != nil {
